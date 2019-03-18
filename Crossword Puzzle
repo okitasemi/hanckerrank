@@ -1,0 +1,150 @@
+#Recursion and BacktrackingCrossword Puzzle
+
+import math
+import os
+import random
+import re
+import sys
+from copy import copy, deepcopy
+
+def crosswordPuzzle(crossword, words):
+    wordList = words.split(";")
+    grid = []
+    for row in range(10):
+        gridRow = []
+        for col in range(10):
+            gridRow.append(crossword[row][col]) 
+        grid.append(gridRow)
+    return crosswordPuzzleGrid(grid, wordList)
+
+def crosswordPuzzleGrid(grid, wordList):
+    newGrid = deepcopy(grid)
+    emptySpaces = [] #[(length, 0/1, rowHead, colHead)]
+    horizontalSpace = {} #key=row#, val=[(colHead, colTail)]
+    verticalSpace = {} #key=col#, val=[(rowHead, rowTail)]
+    for row in range(10):
+        for col in range(10):
+            if grid[row][col] != "+" and grid[row][col] != "X":
+                if row in horizontalSpace:
+                    horizontalSpace[row].append(col)
+                else:
+                    horizontalSpace[row] = [col]
+                if col in verticalSpace:
+                    verticalSpace[col].append(row)
+                else:
+                    verticalSpace[col] = [row]
+
+    isConsecutive = True
+    for row in horizontalSpace: #find consecutive space
+        lengthH = len(horizontalSpace[row])
+        if lengthH > 1:
+            head = horizontalSpace[row][0]
+            for i in range(1, lengthH):
+                if horizontalSpace[row][i] == head + 1:
+                    head = horizontalSpace[row][i]
+                    isConsecutive = True
+                else:
+                    isConsecutive = False
+                    break
+            if isConsecutive:
+                emptySpaces.append((lengthH, 0, row, horizontalSpace[row][0]))
+            
+    isConsecutive = True
+    for col in verticalSpace: #find consecutive space
+        lengthV = len(verticalSpace[col]) 
+        if lengthV > 1:
+            head = verticalSpace[col][0]
+            for i in range(1, lengthV):
+                if verticalSpace[col][i] == head + 1:
+                    head = verticalSpace[col][i]
+                    isConsecutive = True
+                else:
+                    isConsecutive = False
+                    break
+            if isConsecutive:
+                emptySpaces.append((lengthV, 1, verticalSpace[col][0], col))
+
+    print(wordList)
+    print(emptySpaces)
+    #print(horizontalSpace)
+    #print(verticalSpace)
+
+    word = wordList[0]
+    for space in emptySpaces:
+        isFit = True
+        if len(word) == space[0]:
+            if space[1] == 0: #if it's horizontal
+                rowNum = space[2]
+                colNumStart = space[3]
+                colNumEnd = space[3] + space[0]
+                wordI = 0
+                for i in range(colNumStart, colNumEnd):
+                    if newGrid[rowNum][i] == "-" or newGrid[rowNum][i] == word[wordI]:
+                        newGrid[rowNum][i] = word[wordI]
+                        wordI += 1
+                        isFit = True
+                    else:
+                        isFit = False
+                        break
+            if space[1] == 1: #if it's vertical
+                rowNumStart = space[2]
+                rowNumEnd = space[2] + space[0]
+                colNum = space[3]
+                wordI = 0
+                for i in range(rowNumStart, rowNumEnd):
+                    if newGrid[i][colNum] == "-" or newGrid[i][colNum] == word[wordI]:
+                        newGrid[i][colNum] = word[wordI]
+                        wordI += 1
+                        isFit = True
+                    else:
+                        isFit = False
+                        break
+            if isFit:
+                gridToArray(newGrid)
+                newWordList = wordList[1:]
+                if len(newWordList) > 0:
+                    crosswordPuzzleGrid(newGrid, newWordList)
+
+            # if isFit:
+            #     gridToArray(newGrid)
+            #     newWordList = wordList[1:]
+            #     print(newWordList)
+            #     if len(newWordList) > 0:
+            #         crosswordPuzzleGrid(newGrid, newWordList)
+            #     else:
+            #         return gridToArray(newGrid)
+            # else:
+            #     crosswordPuzzleGrid(grid, wordList)
+
+def gridToArray(grid):
+    result = []
+    i = 0
+    for row in grid:
+        line = ""
+        j = 0
+        for col in grid:
+            line += grid[i][j]
+            j += 1
+        result.append(line)
+        i += 1
+    print('\n'.join(result))
+    print('\n')
+    return result
+
+if __name__ == '__main__':
+    fptr = open(os.environ['OUTPUT_PATH'], 'w')
+
+    crossword = []
+
+    for _ in range(10):
+        crossword_item = input()
+        crossword.append(crossword_item)
+
+    words = input()
+
+    result = crosswordPuzzle(crossword, words)
+
+    fptr.write('\n'.join(result))
+    fptr.write('\n')
+
+    fptr.close()
