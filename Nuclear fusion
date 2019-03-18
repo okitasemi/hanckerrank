@@ -1,0 +1,90 @@
+#!/bin/python3
+#https://www.hackerrank.com/contests/hackerrank-all-womens-codesprint-2019/challenges/nuclear-fusion/problem
+
+import math
+import os
+import random
+import re
+import sys
+
+def findDepth(elements):
+    parent = 1
+    numOfChild = 0
+    depth = 2
+    for i in range(n-1):
+        if elements[i] <= parent:
+            numOfChild += 1
+        else:
+            parent += numOfChild
+            numOfChild = 1
+            depth += 1
+    return depth
+        
+def nuclearFusion(elements):
+    depth = findDepth(elements)
+    fusedList = []
+    originalUnfused = []
+    
+    def fusion(currentElements):
+        unfusedList = []
+        pDict = {}
+        for i in range(len(currentElements)):
+            parent = currentElements[i]
+            if parent in pDict:
+                pDict[parent].append(i+2)
+            else:
+                pDict[parent] = [i+2]
+        #print(pDict)
+        for p in pDict:
+            count = len(pDict[p])
+            for i in range(int(math.floor(count/2))):
+                fusedList.append((pDict[p][0+i], pDict[p][-1-i]))
+            if count % 2 == 1:
+                middleIdx = int(math.floor(count/2))
+                unfusedList.append(pDict[p][middleIdx])
+                originalUnfused.append(pDict[p][middleIdx])
+        return unfusedList
+
+    unfused = fusion(elements)
+    for t in range(2, depth):
+        if len(unfused) == 1:
+            break
+        remChild = []
+        for i in range(0, len(unfused), 2):
+            #if elements[elements[unfused[i]-2]-2] == elements[elements[unfused[i+1]-2]-2]:
+            remChild.append(elements[unfused[i]-2])
+            remChild.append(elements[unfused[i+1]-2])
+        newElements = []
+        for i in range(len(remChild)):
+            newElements.append(elements[i])
+        if len(newElements) > 0:
+            unfused = fusion(newElements)
+        else:
+            break
+        
+    if len(unfused) != len(originalUnfused):    
+        for i in range(0, len(originalUnfused) - len(unfused), 2):
+            newfused1 = originalUnfused.pop()
+            newfused2 = originalUnfused.pop()
+            fusedList.pop()
+            fusedList.append((newfused1, newfused2))           
+    unfusedList = [1] + originalUnfused
+    printAnswer(unfusedList, fusedList)
+
+def printAnswer(unfusedList, fusedList):
+    print(len(unfusedList))
+    for v in unfusedList[:-1]:
+        print(v, end=" ")
+    print(unfusedList[-1])
+    print(len(fusedList))
+    for f in fusedList:
+        for v in f[:-1]:
+            print(v, end=" ")
+        print(f[-1])
+
+if __name__ == '__main__':
+    n = int(input().strip())
+
+    elements = list(map(int, input().rstrip().split()))
+
+    nuclearFusion(elements)
