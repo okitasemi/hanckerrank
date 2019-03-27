@@ -1,0 +1,41 @@
+# String Manipulation/Common Child
+# Times out with Python3, but succeeds with Pypy3
+
+import math
+import os
+import random
+import re
+import sys
+
+# Complete the commonChild function below.
+def commonChild(s1, s2):
+    #grid = [[0 for i in range(len(s1)+1)] for j in range(len(s2)+1)]
+    prevRow = [0 for i in range(len(s2)+1)]
+    prevCol = 0
+    i = 0
+    j = 0
+    while i < len(s1):
+        currentRow = [0 for i in range(len(s2)+1)]
+        while j < len(s2):
+            if s1[i] == s2[j]:
+                #grid[i+1][j+1] = grid[i][j] + 1
+                current = prevRow[j] + 1
+            else:
+                #grid[i+1][j+1] = max(grid[i+1][j], grid[i][j+1])
+                current = max(prevCol, prevRow[j+1])
+            prevCol = current
+            currentRow[j+1] = current
+            j += 1
+        prevRow = currentRow
+        prevCol = 0
+        i += 1
+        j = 0
+    return current
+
+if __name__ == '__main__':
+    fptr = open(os.environ['OUTPUT_PATH'], 'w')
+    s1 = input()
+    s2 = input()
+    result = commonChild(s1, s2)
+    fptr.write(str(result) + '\n')
+    fptr.close()
