@@ -9,9 +9,7 @@ import sys
 
 # Complete the countInversions function below.
 def countInversions(arr):
-    numOfSwaps = 0
-    numOfSwaps = mergeSort(arr, 0, len(arr)-1)
-    return numOfSwaps
+    return mergeSort(arr, 0, len(arr)-1)
 
 def mergeSort(arr, leftStart, rightEnd):
     if leftStart >= rightEnd:
@@ -39,19 +37,13 @@ def merge(arr, leftStart, rightEnd, midPt):
             numOfSwaps += (midPt-left+1)
         index += 1
 
-    count = 0
     for i in range(left, midPt+1):
         temp.append(arr[i])
-        count += 1
-    
-    count = 0
     for i in range(right, rightEnd+1):
         temp.append(arr[i])
-        count += 1
-
     for i in range(leftStart, rightEnd+1):
         arr[i] = temp[i-leftStart]
-        
+
     return numOfSwaps
 
 if __name__ == '__main__':
