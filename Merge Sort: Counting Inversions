@@ -10,47 +10,48 @@ import sys
 # Complete the countInversions function below.
 def countInversions(arr):
     numOfSwaps = 0
-    temp = [0 for i in range(len(arr))]
-    numOfSwaps = mergeSort(arr, temp, 0, len(arr)-1)
+    numOfSwaps = mergeSort(arr, 0, len(arr)-1)
     return numOfSwaps
 
-def mergeSort(arr, temp, leftStart, rightEnd):
+def mergeSort(arr, leftStart, rightEnd):
     if leftStart >= rightEnd:
         return 0
     midPt = int((leftStart + rightEnd) / 2)
-    leftNum = mergeSort(arr, temp, leftStart, midPt)
-    rightNum = mergeSort(arr, temp, midPt+1, rightEnd)
-    numOfSwaps = merge(arr, temp, leftStart, rightEnd, midPt)
+    leftNum = mergeSort(arr, leftStart, midPt)
+    rightNum = mergeSort(arr, midPt+1, rightEnd)
+    numOfSwaps = merge(arr, leftStart, rightEnd, midPt)
     return leftNum + rightNum + numOfSwaps
     
-def merge(arr, temp, leftStart, rightEnd, midPt):
-    #print("before", numOfSwaps)
+def merge(arr, leftStart, rightEnd, midPt):
+    temp = []
     numOfSwaps = 0
     left = leftStart
     right = midPt + 1
     index = leftStart
+
     while left <= midPt and right <= rightEnd:
         if arr[left] <= arr[right]:
-            temp[index] = arr[left]
+            temp.append(arr[left])
             left += 1
         else:
-            temp[index] = arr[right]
+            temp.append(arr[right])
             right += 1
             numOfSwaps += (midPt-left+1)
         index += 1
-    if left < midPt+1:
-        count = 0
-        for i in range(left, midPt+1):
-            temp[index+count] = arr[i]
-            count += 1
-    if right < rightEnd + 1:
-        count = 0
-        for i in range(right, rightEnd+1):
-            temp[index+count] = arr[i]
-            count += 1
+
+    count = 0
+    for i in range(left, midPt+1):
+        temp.append(arr[i])
+        count += 1
+    
+    count = 0
+    for i in range(right, rightEnd+1):
+        temp.append(arr[i])
+        count += 1
+
     for i in range(leftStart, rightEnd+1):
-        arr[i] = temp[i]
-    #print("after", numOfSwaps)
+        arr[i] = temp[i-leftStart]
+        
     return numOfSwaps
 
 if __name__ == '__main__':
