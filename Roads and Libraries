@@ -1,0 +1,76 @@
+#!/bin/python3
+#Graphs / Roads and Libraries
+
+import math
+import os
+import random
+import re
+import sys
+
+# Complete the roadsAndLibraries function below.
+def roadsAndLibraries(n, c_lib, c_road, cities):
+
+    # if cost of library < cost of road, just build a library in each city
+    if c_lib <= c_road:
+        return c_lib * n
+
+    connectionDict = {}
+    for i in range(n):
+        connectionDict[i] = []
+    for cityPair in cities:
+        city1 = cityPair[0]-1
+        city2 = cityPair[1]-1
+        if city1 in connectionDict:
+            connectionDict[city1].append(city2)
+        else:
+            connectionDict[city1] = [city2]
+        if city2 in connectionDict:
+            connectionDict[city2].append(city1)
+        else:
+            connectionDict[city2] = [city1] 
+
+    numOfNetwork = 0    
+    visited = [0 for i in range(n)]
+    for i in range(n):
+        if visited[i] == 0:
+            numOfNetwork += 1 
+            visited = findVisited(i, visited, connectionDict) 
+
+    #in a network, every road repaired reduces the number of library by 1
+    cost = numOfNetwork * c_lib + (n - numOfNetwork) * c_road
+    return cost
+
+def findVisited(i, visited, connectionDict):
+    visited[i] = 1
+    connections = connectionDict[i] 
+    for j in connections:
+        if visited[j] == 0:
+            visited = findVisited(j, visited, connectionDict)
+    return visited
+
+if __name__ == '__main__':
+    fptr = open(os.environ['OUTPUT_PATH'], 'w')
+
+    q = int(input())
+
+    for q_itr in range(q):
+        nmC_libC_road = input().split()
+
+        n = int(nmC_libC_road[0])
+
+        m = int(nmC_libC_road[1])
+
+        c_lib = int(nmC_libC_road[2])
+
+        c_road = int(nmC_libC_road[3])
+
+        cities = []
+
+        for _ in range(m):
+            cities.append(list(map(int, input().rstrip().split())))
+
+        result = roadsAndLibraries(n, c_lib, c_road, cities)
+
+        fptr.write(str(result) + '\n')
+
+    fptr.close()
