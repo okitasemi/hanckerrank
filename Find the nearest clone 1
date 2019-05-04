@@ -1,0 +1,114 @@
+# Graphs / Find the nearest clone (DUMB SOLUTION)
+#!/bin/python3
+
+import math
+import os
+import random
+import re
+import sys
+
+# Complete the findShortest function below.
+# For the weighted graph, <name>:
+# 1. The number of nodes is <name>_nodes.
+# 2. The number of edges is <name>_edges.
+# 3. An edge exists between <name>_from[i] to <name>_to[i].
+
+class Node(object):
+    def __init__(self, node_id, color):
+        self.node_id = node_id
+        self.color = color
+        self.next_ids = []
+        self.visited = False
+        self.distFromHead = 0
+    def addConnection(self, next_id):
+        self.next_ids.append(next_id)
+    def hasVisited(self, hasVisited):
+        self.visited = hasVisited
+    def setDist(self, dist):
+        self.distFromHead = dist
+    
+def fillConnections(nodes, from_nodes, to_nodes):
+    for i in range(graph_edges):
+        this_id = from_nodes[i]
+        next_id = to_nodes[i]
+        nodes[this_id].addConnection(next_id)
+
+def findShortest(graph_nodes, graph_from, graph_to, ids, val):
+    nodes = {}
+    for i in range(graph_nodes):
+        color = ids[i]
+        node = Node(i+1, color)
+        nodes[node.node_id] = node
+    fillConnections(nodes, graph_from, graph_to)
+    fillConnections(nodes, graph_to, graph_from)
+
+    # put first node of specified color in queue
+    count = 0
+    head_nodes = {}
+    for node_id in nodes:
+        if nodes[node_id].color == val:
+            head_nodes[node_id] = node
+            count += 1
+    if count < 2:
+        return -1
+    #return checkDist(head_nodes, nodes, val)
+    distances = []
+    visited_heads = {}
+    for node_id in head_nodes:
+        dist = checkColor(nodes[node_id], nodes, val)
+        if dist == 1:
+            return 1
+        distances.append(dist)
+        visited_heads[node.node_id] = node
+        clearVisitedRecord(nodes, visited_heads)
+    minDist = graph_nodes
+    for dist in distances:
+        if dist != -1 and dist < minDist:
+            minDist = dist
+    return minDist
+
+def checkColor(node, nodes, val):
+    queue = [node.node_id]
+    node.visited = True
+    while len(queue) != 0:
+        nid = queue.pop(0)
+        head_node = nodes[nid]
+        dist = head_node.distFromHead + 1
+        next_ids = head_node.next_ids
+        if len(next_ids) == 0:
+            return -1
+        for node_id in next_ids:
+            if not nodes[node_id].visited:
+                if nodes[node_id].color == val:
+                    return dist
+                queue.append(node_id)
+                nodes[node_id].visited = True
+                nodes[node_id].setDist(dist)
+    return graph_nodes
+
+def clearVisitedRecord(nodes, visited_heads):
+    for node_id in nodes:
+        nodes[node_id].visited = False
+    for node_id in visited_heads:
+        visited_heads[node_id].visited = True
+
+if __name__ == '__main__':
+    fptr = open(os.environ['OUTPUT_PATH'], 'w')
+
+    graph_nodes, graph_edges = map(int, input().split())
+
+    graph_from = [0] * graph_edges
+    graph_to = [0] * graph_edges
+
+    for i in range(graph_edges):
+        graph_from[i], graph_to[i] = map(int, input().split())
+
+    ids = list(map(int, input().rstrip().split()))
+
+    val = int(input())
+
+    ans = findShortest(graph_nodes, graph_from, graph_to, ids, val)
+
+    fptr.write(str(ans) + '\n')
+
+    fptr.close()
