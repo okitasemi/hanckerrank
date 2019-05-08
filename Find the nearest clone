@@ -1,4 +1,8 @@
-# Graphs / Find the nearest clone (DUMB SOLUTION)
+#Graphs / Find the nearest clone
+#Find all nodes of specified color
+#Do BFS on all nodes and keep track of distance from head nodes
+#When a node is visited twice from different head nodes, add up the distance from each headnoe
+
 #!/bin/python3
 
 import math
@@ -20,12 +24,15 @@ class Node(object):
         self.next_ids = []
         self.visited = False
         self.distFromHead = 0
+        self.head_node = self
     def addConnection(self, next_id):
         self.next_ids.append(next_id)
     def hasVisited(self, hasVisited):
         self.visited = hasVisited
     def setDist(self, dist):
         self.distFromHead = dist
+    def setHead(self, node):
+        self.head_node = node
     
 def fillConnections(nodes, from_nodes, to_nodes):
     for i in range(graph_edges):
@@ -42,55 +49,46 @@ def findShortest(graph_nodes, graph_from, graph_to, ids, val):
     fillConnections(nodes, graph_from, graph_to)
     fillConnections(nodes, graph_to, graph_from)
 
-    # put first node of specified color in queue
+    # put all nodes of specified color in a queue
     count = 0
-    head_nodes = {}
+    queue = []
     for node_id in nodes:
-        if nodes[node_id].color == val:
-            head_nodes[node_id] = node
+        node = nodes[node_id]
+        if node.color == val:
+            node.visited = True
+            queue.append(node)
             count += 1
     if count < 2:
         return -1
+    return checkDist(queue, nodes, val)
 
-    distances = []
-    visited_heads = {}
-    for node_id in head_nodes:
-        dist = checkColor(nodes[node_id], nodes, val)
-        if dist == 1:
-            return 1
-        distances.append(dist)
-        visited_heads[node.node_id] = node
-        clearVisitedRecord(nodes, visited_heads)
-    minDist = graph_nodes
-    for dist in distances:
-        if dist != -1 and dist < minDist:
-            minDist = dist
-    return minDist
+def checkDist(queue, nodes, val):
+    found = False
+    maxDist = graph_edges                                                                
 
-def checkColor(node, nodes, val):
-    queue = [node.node_id]
-    node.visited = True
     while len(queue) != 0:
-        nid = queue.pop(0)
-        head_node = nodes[nid]
-        dist = head_node.distFromHead + 1
-        next_ids = head_node.next_ids
+        top_node = queue.pop(0)
+        dist = top_node.distFromHead + 1     
+        next_ids = top_node.next_ids
         if len(next_ids) == 0:
             return -1
-        for node_id in next_ids:
-            if not nodes[node_id].visited:
-                if nodes[node_id].color == val:
-                    return dist
-                queue.append(node_id)
-                nodes[node_id].visited = True
-                nodes[node_id].setDist(dist)
-    return graph_nodes
 
-def clearVisitedRecord(nodes, visited_heads):
-    for node_id in nodes:
-        nodes[node_id].visited = False
-    for node_id in visited_heads:
-        visited_heads[node_id].visited = True
+        for nid in next_ids:
+            n = nodes[nid]
+            if n.visited:
+                if n.head_node is not top_node.head_node:
+                    found = True
+                    distance = n.distFromHead + dist
+                    if distance < maxDist:
+                        maxDist = distance
+            else:
+                n.setHead(top_node.head_node)
+                queue.append(n)
+                n.visited = True
+                n.setDist(dist)
+        if found:
+            return maxDist
+    return -1
 
 if __name__ == '__main__':
     fptr = open(os.environ['OUTPUT_PATH'], 'w')
