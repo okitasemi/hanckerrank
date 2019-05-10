@@ -1,0 +1,67 @@
+# Graphs / BFS: Shortest Reach in a Graph
+#!/bin/python3
+
+import math
+import os
+import random
+import re
+import sys
+
+class Node(object):
+    def __init__(self):
+        self.visited = False
+        self.nextNodes = {}
+        self.distFromHead = -1
+    def connect(self, nodeId, node):
+        self.nextNodes[nodeId] = node
+
+class Graph(object):
+    def __init__(self, n):
+        self.nodes = [None for i in range(n)]
+
+    def connect(self, nodeId1, nodeId2):
+        if self.nodes[nodeId1] is None:
+            self.nodes[nodeId1] = Node()
+        if self.nodes[nodeId2] is None:
+            self.nodes[nodeId2] = Node()
+        self.nodes[nodeId1].connect(nodeId2, self.nodes[nodeId2])
+        self.nodes[nodeId2].connect(nodeId1, self.nodes[nodeId1])
+
+    def find_all_distances(self, startNodeId):
+        queue = []
+        if self.nodes[startNodeId] is None:
+            self.nodes[startNodeId] = Node()
+        self.nodes[startNodeId].visited = True
+        self.nodes[startNodeId].distFromHead = 0
+        queue.append(self.nodes[startNodeId])
+
+        while len(queue) != 0:
+            topNode = queue.pop(0)
+            dist = topNode.distFromHead + 1
+            for nodeId in topNode.nextNodes:
+                node = topNode.nextNodes[nodeId]
+                if not node.visited:
+                    node.visited = True
+                    node.distFromHead = dist
+                    queue.append(node)
+        
+        distances = []
+        for node in self.nodes:
+            if node is None or node.distFromHead == -1:
+                distances.append(-1)
+            else:
+                if node.distFromHead != 0:
+                    distances.append(node.distFromHead * 6)
+
+        print(" ".join(map(str, distances)))
+
+if __name__ == '__main__':
+    t = int(input())
+    for i in range(t):
+        n,m = [int(value) for value in input().split()]
+        graph = Graph(n)
+        for i in range(m):
+            x,y = [int(x) for x in input().split()]
+            graph.connect(x-1,y-1) 
+        s = int(input())
+        graph.find_all_distances(s-1)
