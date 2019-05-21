@@ -1,4 +1,3 @@
-#Graphs / Matrix
 #!/bin/python3
 
 import math
@@ -7,47 +6,44 @@ import random
 import re
 import sys
 
-class City(object):
-    def __init__(self):
-        self.hasMachine = False
-
 def findCapital(capitals, cityId):
-    if capitals[cityId] == cityId:
-        return cityId
-    return findCapital(capitals, capitals[cityId])
+    capitalId = capitals[cityId][0]
+    if capitalId == cityId:
+        return capitalId
+    return findCapital(capitals, capitalId)
 
-def union(capitals, capital1, capital2):
-    capitals[capital1] = capital2
+def union(capitals, capitalId1, capitalId2):
+    capitals[capitalId1][0] = capitalId2
     return capitals
 
-def removeRoads(roads, citiesDict):
+def removeRoads(roads, capitals):
     totalTime = 0
-    capitals = [i for i in range(n)]
     for road in roads:
         city1 = road[0]
         city2 = road[1]
         cost = road[2]
-        capital1 = findCapital(capitals, city1)
-        capital2 = findCapital(capitals, city2)
-        if citiesDict[capital1].hasMachine:
-            if citiesDict[capital2].hasMachine: 
-                if capital1 != capital2:
+        capitalId1 = findCapital(capitals, city1)
+        capitalId2 = findCapital(capitals, city2)
+        # If both cities have machine occupied capitals, remove that road
+        # Otherwise, merge the two cities
+        if capitals[capitalId1][1]:
+            if capitals[capitalId2][1]: 
+                if capitalId1 != capitalId2:
                     totalTime += cost
             else:
-                capitals = union(capitals, capital2, capital1)
+                capitals = union(capitals, capitalId2, capitalId1)
         else:
-            capitals = union(capitals, capital1, capital2)
+            capitals = union(capitals, capitalId1, capitalId2)
     return totalTime
 
 def minTime(roads, machines):
-    citiesDict = {}
-    for i in range(n):
-        citiesDict[i] = City()
+    # A list of capitals. index=cityId, value=[capitalId, hasMachine]
+    capitals = [[i, False] for i in range(n)]
     for machine in machines:
-        citiesDict[machine].hasMachine = True
+        capitals[machine][1] = True
+    # Sort the roads by cost in decreasing order so the more pricy road is omitted first
     roads.sort(key=lambda x:x[2], reverse=True)
-    totalTime = removeRoads(roads, citiesDict)
-    print(totalTime)
+    totalTime = removeRoads(roads, capitals)
     return totalTime
 
 if __name__ == '__main__':
