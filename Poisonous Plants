@@ -1,0 +1,48 @@
+# Stacks and Queues / Poisonous Plants
+#!/bin/python3
+
+import math
+import os
+import random
+import re
+import sys
+
+def poisonousPlants(p):
+    # Construct a list of queues, each being a segment of p in descending order
+    stackList = [[p[0]]]
+    for plant in p[1:]:
+        topPlant = stackList[-1][-1]
+        if plant <= topPlant:
+            stackList[-1].append(plant)
+        else:
+            newStack = [plant]
+            stackList.append(newStack)
+            
+    numOfDays = 0
+    while len(stackList) > 1:
+        i = 1
+        while i < len(stackList):
+            # Remove bottom element b/c it is larger than top element of previous queue
+            stackList[i].pop(0)
+            if len(stackList[i]) == 0:
+                stackList.pop(i)
+                continue
+            # If the top element of queue i-1 > bottom element of queue i, merge them
+            topPlant = stackList[i-1][-1]
+            bottomPlant = stackList[i][0]
+            if topPlant >= bottomPlant:
+                temp = stackList.pop(i)
+                stackList[i-1] += temp
+                i -= 1
+            i += 1
+        # Increment numOfDays only after all merging is done
+        numOfDays += 1
+    return numOfDays
+
+if __name__ == '__main__':
+    fptr = open(os.environ['OUTPUT_PATH'], 'w')
+    n = int(input())
+    p = list(map(int, input().rstrip().split()))
+    result = poisonousPlants(p)
+    fptr.write(str(result) + '\n')
+    fptr.close()
