@@ -1,0 +1,39 @@
+# Search / Hash Tables: Ice Cream Parlor
+#!/bin/python3
+
+import math
+import os
+import random
+import re
+import sys
+
+def whatFlavors(cost, money):
+    CostToIdxDict = {}
+    for i in range(len(cost)):
+        if cost[i] not in CostToIdxDict:
+            CostToIdxDict[cost[i]] = [i]
+        else:
+            CostToIdxDict[cost[i]].append(i)
+    
+    id1, id2 = 0, 0
+    for i in range(len(cost)):
+        if cost[i] < money:
+            balance = money - cost[i]
+            if balance in CostToIdxDict:
+                id1 = i
+                id2 = CostToIdxDict[balance][0]
+                if id2 == id1 and len(CostToIdxDict[balance]) > 1:
+                    id2 = CostToIdxDict[balance][1]
+                
+                if id1 != id2:
+                    break
+
+    print(id1+1, id2+1)
+
+if __name__ == '__main__':
+    t = int(input())
+    for t_itr in range(t):
+        money = int(input())
+        n = int(input())
+        cost = list(map(int, input().rstrip().split()))
+        whatFlavors(cost, money)
