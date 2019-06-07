@@ -1,0 +1,53 @@
+# Search / Triple sum
+#!/bin/python3
+
+import math
+import os
+import random
+import re
+import sys
+
+def triplets(arra, arrb, arrc):
+    arra.sort()
+    arrb.sort()
+    arrc.sort()
+    i, j, k = 0, 0, 0
+    countA, countC, count = 0, 0, 0
+    prevA, prevB, prevC = -1, -1, -1
+    while i < len(arrb):
+        if arrb[i] == prevB:
+            i += 1
+            continue
+        while j < len(arra):
+            if arra[j] <= arrb[i]:
+                if arra[j] != prevA:
+                    countA += 1
+                prevA = arra[j]
+                j += 1
+            else:
+                break
+        while k < len(arrc):
+            if arrc[k] <= arrb[i]:
+                if arrc[k] != prevC:
+                    countC += 1
+                prevC = arrc[k]
+                k += 1
+            else:
+                break
+        count += countA * countC
+        prevB = arrb[i]
+        i += 1
+    return count
+
+if __name__ == '__main__':
+    fptr = open(os.environ['OUTPUT_PATH'], 'w')
+    lenaLenbLenc = input().split()
+    lena = int(lenaLenbLenc[0])
+    lenb = int(lenaLenbLenc[1])
+    lenc = int(lenaLenbLenc[2])
+    arra = list(map(int, input().rstrip().split()))
+    arrb = list(map(int, input().rstrip().split()))
+    arrc = list(map(int, input().rstrip().split()))
+    ans = triplets(arra, arrb, arrc)
+    fptr.write(str(ans) + '\n')
+    fptr.close()
