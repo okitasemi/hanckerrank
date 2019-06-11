@@ -1,0 +1,87 @@
+# Search / Swap Nodes
+#!/bin/python3
+
+import os
+import sys
+
+class Node(object):
+    def __init__(self, idx):
+        self.idx = idx
+    def setLeft(self, leftNode):
+        self.leftNode = leftNode
+    def setRight(self, rightNode):
+        self.rightNode = rightNode
+
+def getDepth(node, depth):
+    if node.idx != -1:
+        depth += 1
+        depthL = getDepth(node.leftNode, depth)
+        depthR = getDepth(node.rightNode, depth)
+        depth = max(depthL, depthR)
+    return depth
+
+def buildTree(indexes):
+    root = Node(1)
+    nodes = [root]
+    for pair in indexes:
+        leftNode = Node(pair[0])
+        rightNode = Node(pair[1])
+        currentNode = nodes.pop(0)
+        while currentNode.idx == -1:
+            currentNode = nodes.pop(0)
+        currentNode.setLeft(leftNode)
+        currentNode.setRight(rightNode)
+        nodes.append(leftNode)
+        nodes.append(rightNode)
+    depth = getDepth(root, 0)
+    return root, depth
+
+def visitNodesInOrder(node, result):
+    if node.idx != -1:
+        result = visitNodesInOrder(node.leftNode, result)
+        result.append(node.idx)
+        result = visitNodesInOrder(node.rightNode, result)
+    return result
+
+def swapNodeAtDepth(node, targetedDepth, currentDepth):
+    if node.idx != -1:
+        if currentDepth == targetedDepth:
+            temp = node.leftNode
+            node.leftNode = node.rightNode
+            node.rightNode = temp
+        else:
+            currentDepth += 1
+            swapNodeAtDepth(node.leftNode, targetedDepth, currentDepth)
+            swapNodeAtDepth(node.rightNode, targetedDepth, currentDepth)
+
+def swapNodes(indexes, queries):
+    results = []
+    root, depth = buildTree(indexes)
+    for query in queries:
+        targetedDepth = query
+        multiplier = 1
+        while targetedDepth < depth:
+            swapNodeAtDepth(root, targetedDepth, 1)
+            multiplier += 1
+            targetedDepth = query * multiplier
+        result = []
+        result = visitNodesInOrder(root, result)
+        results.append(result)
+    return results
+    
+if __name__ == '__main__':
+    sys.setrecursionlimit(15000)
+    fptr = open(os.environ['OUTPUT_PATH'], 'w')
+    n = int(input())
+    indexes = []
+    for _ in range(n):
+        indexes.append(list(map(int, input().rstrip().split())))
+    queries_count = int(input())
+    queries = []
+    for _ in range(queries_count):
+        queries_item = int(input())
+        queries.append(queries_item)
+    result = swapNodes(indexes, queries)
+    fptr.write('\n'.join([' '.join(map(str, x)) for x in result]))
+    fptr.write('\n')
+    fptr.close()
