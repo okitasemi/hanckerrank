@@ -7,6 +7,8 @@ import random
 import re
 import sys
 
+# O(n) = n 
+# More precisely, log(k)n where k = diff between initial minTime & maxTime, e.g. 10^9
 def minTime(machines, goal):
     # Find the min and max time if all machines have the same fastest/slowest rate
     fastestM = min(machines)
