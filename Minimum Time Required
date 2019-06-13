@@ -1,0 +1,39 @@
+# Search / Minimum Time Required
+#!/bin/python3
+
+import math
+import os
+import random
+import re
+import sys
+
+def minTime(machines, goal):
+    # Find the min and max time if all machines have the same fastest/slowest rate
+    fastestM = min(machines)
+    slowestM = max(machines)
+    minTime = math.ceil(goal / n) * fastestM 
+    maxTime = math.ceil(goal / n) * slowestM 
+
+    # Narrow down the time to find the min time required
+    while minTime < maxTime:
+        time = int((minTime + maxTime) / 2)
+        numOfItems = 0
+        for m in machines:
+            numOfItems += math.floor(time / m)
+
+        # Time might not be minTime when numOfItems == goal, so continue to search
+        if numOfItems >= goal: 
+            maxTime = time
+        elif numOfItems < goal:
+            minTime = time + 1
+    return minTime
+
+if __name__ == '__main__':
+    fptr = open(os.environ['OUTPUT_PATH'], 'w')
+    nGoal = input().split()
+    n = int(nGoal[0])
+    goal = int(nGoal[1])
+    machines = list(map(int, input().rstrip().split()))
+    ans = minTime(machines, goal)
+    fptr.write(str(ans) + '\n')
+    fptr.close()
