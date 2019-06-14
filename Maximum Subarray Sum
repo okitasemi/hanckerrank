@@ -1,0 +1,62 @@
+# Search / Maximum Subarray Sum
+#!/bin/python3
+
+import math
+import os
+import random
+import re
+import sys
+
+def maximumSum(a, m):
+
+    # Calculate the remainder at each element
+    remainders = []
+    for num in a:
+        rem = num % m
+        remainders.append(rem)
+
+    # Construct a prefix sum remainder array of tuples where
+    # Each tuple = (remainder of this prefix sum, index)
+    # Remainder of the sum of each subarray [i, j] = (prefixRems[j] - prefixRems[i]) % m
+    # Or (prefixRems[j] - prefixRems[i] + m) % m in case prefixRems[j] < prefixRems[i]
+    # Note that if prefixRems[j] >= prefixRems[i], the result would be < prefixRems[j]
+    # So we don't even need to consider these cases
+    # Our goal is to find pairs of i & j where prefixRems[j] < prefixRems[i]
+    prefixRems = []
+    currentRem = 0
+    i = 0
+    while i < n:
+        currentRem = (currentRem + remainders[i]) % m
+        prefixRems.append((currentRem, i))
+        i += 1
+
+    # diff = |prefixRems[j] - prefixRems[i]| (absolute value)
+    # Since we need the max remainder, we are looking for the smallest diff
+    # In order to find the smallest diff, we sort the array by the remainder value
+    # Now the smallest diff can only be between neighbor values
+    prefixRems.sort(key = lambda x: x[0])
+    maxRemainder = 0
+    k = 0
+    while k < n-1:
+        tupleA = prefixRems[k]
+        tupleB = prefixRems[k+1]
+        # Among these neighboring pairs, we only look at the ones where i < j 
+        if tupleA[0] < tupleB[0] and tupleA[1] > tupleB[1]:
+            rem = (tupleA[0] - tupleB[0] + m) % m
+            maxRemainder = max(maxRemainder, rem)
+        # Also need to consider the subarray [0, j]
+        maxRemainder = max(maxRemainder, tupleB[0])
+        k += 1
+    return maxRemainder
+
+if __name__ == '__main__':
+    fptr = open(os.environ['OUTPUT_PATH'], 'w')
+    q = int(input())
+    for q_itr in range(q):
+        nm = input().split()
+        n = int(nm[0])
+        m = int(nm[1])
+        a = list(map(int, input().rstrip().split()))
+        result = maximumSum(a, m)
+        fptr.write(str(result) + '\n')
+    fptr.close()
