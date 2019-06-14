@@ -1,0 +1,44 @@
+# Search / Pairs
+#!/bin/python3
+
+import math
+import os
+import random
+import re
+import sys
+
+# Time complexity: O(nlogn)
+def pairs(k, arr):
+    # Create a new list arrB where the absolute value, |arrB[i] - arr[i]| = k
+    arrB = []
+    for num in arr:
+        desiredNum = num + k
+        arrB.append(desiredNum)
+        if num > k:
+            desiredNum = num - k
+            arrB.append(desiredNum)
+
+    # Sort both lists
+    # For each num in arrB, check if it is in arr
+    arrB.sort()
+    arr.sort()
+    count, i,j = 0, 0, 0
+    while i < len(arrB) and j < n:
+        if arrB[i] == arr[j]:
+            count += 1
+            i += 1
+        elif arrB[i] < arr[j]:
+            i += 1
+        else: #arrB[i] > arr[j]
+            j += 1
+    return int(count/2)
+
+if __name__ == '__main__':
+    fptr = open(os.environ['OUTPUT_PATH'], 'w')
+    nk = input().split()
+    n = int(nk[0])
+    k = int(nk[1])
+    arr = list(map(int, input().rstrip().split()))
+    result = pairs(k, arr)
+    fptr.write(str(result) + '\n')
+    fptr.close()
