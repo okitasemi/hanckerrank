@@ -8,7 +8,7 @@ import re
 import sys
 
 # Time complexity: O(nlogn)
-def pairs(k, arr):
+def pairsSlow(k, arr):
     # Create a new list arrB where the absolute value, |arrB[i] - arr[i]| = k
     arrB = []
     for num in arr:
@@ -32,6 +32,15 @@ def pairs(k, arr):
         else: #arrB[i] > arr[j]
             j += 1
     return int(count/2)
+
+# Time complecity: O(n)
+def pairs(k, arr):
+    count = 0
+    targetSet = set(arr)
+    for num in arr:
+        if num + k in targetSet:
+            count += 1
+    return count
 
 if __name__ == '__main__':
     fptr = open(os.environ['OUTPUT_PATH'], 'w')
