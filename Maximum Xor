@@ -1,0 +1,112 @@
+# Miscellaneous / Maximum Xor
+
+import math
+import os
+import random
+import re
+import sys
+
+def maxXorNaive(arr, queries):
+    result = []
+    for q in queries:
+        maxX = 0
+        for num in arr:
+            xor = num^q
+            if xor > maxX:
+                maxX = xor
+        result.append(maxX)
+    return result
+
+class Node(object):
+    def __init__(self, value):
+        self.value = value
+        self.leftNode = None
+        self.rightNode = None
+
+class BinTrie(object):
+    def __init__(self, trieHeight):
+        self.root = Node(0)
+        self.height = trieHeight
+    def printTrie(self, node):
+        if node:
+            self.printTrie(node.leftNode)
+            print(node.value)
+            self.printTrie(node.rightNode)
+
+def maxXor(arr, queries):
+    results = []
+    maxValue = max(max(arr), max(queries))
+    trieHeight = math.ceil((math.log2(maxValue))) + 1
+    trie = BinTrie(trieHeight)
+    buildTrie(trie, arr)
+    #trie.printTrie(trie.root)
+    for query in queries:
+        result = findMax(trie, query)
+        results.append(result)
+    return results
+    
+def buildTrie(trie, arr):
+    for num in arr:
+        binList = [int(i) for i in bin(num)[2:]]
+        prefix = [0 for i in range(trie.height - len(binList))]
+        binList = prefix + binList
+        #print("num", binList)
+        node = trie.root
+        idx = 1
+        while idx < len(binList):
+            if binList[idx] == 0:
+                if not node.leftNode:
+                    node.leftNode = Node(0)
+                node = node.leftNode
+            else:
+                if not node.rightNode:
+                    node.rightNode = Node(1)
+                node = node.rightNode
+            idx += 1
+
+def findMax(trie, query):
+    maxBinList = []
+    binList = [int(i) for i in bin(query)[2:]]
+    prefix = [0 for i in range(trie.height - len(binList))]
+    binList = prefix + binList
+    #print("query", binList)
+    node = trie.root
+    idx = 1
+    while idx < len(binList):
+        if binList[idx] == 0:
+            if node.rightNode:
+                maxBinList.append(1)
+                node = node.rightNode
+            else:
+                maxBinList.append(0)
+                node = node.leftNode
+        else: # == 1
+            if node.leftNode:
+                maxBinList.append(1)
+                node = node.leftNode
+            else:
+                maxBinList.append(0)
+                node = node.rightNode
+        idx += 1
+    decNum = convertBinListToNum(maxBinList)
+    return decNum
+
+def convertBinListToNum(binList):
+    binString = ''
+    for digit in binList:
+        binString += str(digit)
+    return int(binString, 2)
+
+if __name__ == '__main__':
+    fptr = open(os.environ['OUTPUT_PATH'], 'w')
+    n = int(input())
+    arr = list(map(int, input().rstrip().split()))
+    m = int(input())
+    queries = []
+    for _ in range(m):
+        queries_item = int(input())
+        queries.append(queries_item)
+    result = maxXor(arr, queries)
+    fptr.write('\n'.join(map(str, result)))
+    fptr.write('\n')
+    fptr.close()
