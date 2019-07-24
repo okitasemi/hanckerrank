@@ -1,0 +1,56 @@
+#Graph Theory / Even Tree
+
+import math
+import os
+import random
+import re
+import sys
+
+class Node(object):
+    def __init__(self, index):
+        self.index = index
+        self.numOfConnected = 0
+        self.neighbors = []
+
+def evenForest(t_nodes, t_edges, t_from, t_to):
+    nodes = populateTree(t_from, t_to)
+    visitedIdx = {nodes[1]}
+    countConnected(nodes[1], nodes, visitedIdx)
+    numOfEdges = 0
+    for idx in nodes:
+        if nodes[idx].numOfConnected % 2 == 0:
+            numOfEdges += 1
+    return numOfEdges
+
+def populateTree(t_from, t_to):
+    nodes = {}
+    for fromIdx, toIdx in zip(t_from, t_to):
+        if fromIdx not in nodes:
+            fromNode = Node(fromIdx)
+            nodes[fromIdx] = fromNode
+        if toIdx not in nodes:
+            toNode = Node(toIdx)
+            nodes[toIdx] = toNode
+        nodes[fromIdx].neighbors.append(toIdx)
+        nodes[toIdx].neighbors.append(fromIdx)
+    return nodes
+
+def countConnected(startingNode, nodes, visitedIdx):
+    visitedIdx.add(startingNode.index)
+    for neighbor in startingNode.neighbors:
+        if neighbor not in visitedIdx:
+            startingNode.numOfConnected += countConnected(nodes[neighbor], nodes, visitedIdx)
+        else:
+            startingNode.numOfConnected += 1
+    return startingNode.numOfConnected
+
+if __name__ == '__main__':
+    fptr = open(os.environ['OUTPUT_PATH'], 'w')
+    t_nodes, t_edges = map(int, input().rstrip().split())
+    t_from = [0] * t_edges
+    t_to = [0] * t_edges
+    for i in range(t_edges):
+        t_from[i], t_to[i] = map(int, input().rstrip().split())
+    res = evenForest(t_nodes, t_edges, t_from, t_to)
+    fptr.write(str(res) + '\n')
+    fptr.close()
