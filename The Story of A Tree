@@ -1,0 +1,102 @@
+#Graph Theory / The Story of a Tree
+#DID NOT PASS ALL TEST CASES
+
+import os
+import sys
+from fractions import Fraction
+
+def storyOfATree(n, edges, k, guesses):
+    numOfSuccess = 0
+    nodes = buildUndirectedTree(edges)
+    directedNodes = applyDirectionFromRoot(nodes)
+    #print(directedNodes)
+    count = evalGuesses(directedNodes, guesses)
+    #print(count)
+    for idx in directedNodes:
+        newCount = count
+        oldEdges = tryNewRoot(directedNodes, idx)
+        for edge in oldEdges:
+            if edge in guesses:
+                newCount -= 1
+            reversedEdge = (edge[1], edge[0])
+            if reversedEdge in guesses:
+                newCount += 1
+        #print("newCount", newCount)
+        if newCount >= k:
+            numOfSuccess += 1
+    return str(Fraction(numOfSuccess/n).limit_denominator())
+               
+def buildUndirectedTree(edges):
+    nodes = {}
+    for edge in edges:
+        idx1 = edge[0]
+        idx2 = edge[1]
+        if idx1 not in nodes:
+            nodes[idx1] = []
+        if idx2 not in nodes:
+            nodes[idx2] = []
+        nodes[idx1].append(idx2)
+        nodes[idx2].append(idx1)
+    return nodes
+
+def applyDirectionFromRoot(nodes):
+    directedNodes = {}
+    visited = set()
+    # select a random node as root
+    queue = [1]
+    while queue:
+        idx = queue.pop(0)
+        visited.add(idx)
+        if idx not in directedNodes:
+            directedNodes[idx] = set()
+        for newIdx in nodes[idx]:
+            if newIdx not in visited:
+                queue.append(newIdx)
+            if newIdx not in directedNodes:
+                directedNodes[idx].add(newIdx)
+    return directedNodes
+
+def evalGuesses(directedNodes, guesses):
+    count = 0
+    for guess in guesses:
+        idx1 = guess[0]
+        idx2 = guess[1]
+        if idx2 in directedNodes[idx1]:
+            count += 1
+    return count
+
+def tryNewRoot(directedNodes, idx):
+    visited = {1}
+    oldEdges = DFS(directedNodes, visited, 1, idx)[1]
+    #print("new root:", idx, "oldEdges:", oldEdges)
+    return oldEdges
+
+def DFS(directedNodes, visited, startIdx, endIdx):
+    if startIdx == endIdx:
+        return True, []
+    visited.add(startIdx)
+    for idx in directedNodes[startIdx]:
+        if idx not in visited:
+            result, oldEdges = DFS(directedNodes, visited, idx, endIdx)
+            if result:
+                oldEdges.append([startIdx, idx])
+                return True, oldEdges
+    return False, []
+
+if __name__ == '__main__':
+    fptr = open(os.environ['OUTPUT_PATH'], 'w')
+    q = int(input())
+    for q_itr in range(q):
+        n = int(input())
+        edges = []
+        for _ in range(n-1):
+            edges.append(list(map(int, input().rstrip().split())))
+        gk = input().split()
+        g = int(gk[0])
+        k = int(gk[1])
+        guesses = []
+        for _ in range(g):
+            guesses.append(list(map(int, input().rstrip().split())))
+        result = storyOfATree(n, edges, k, guesses)
+        fptr.write(result + '\n')
+    fptr.close()
