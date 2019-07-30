@@ -1,0 +1,61 @@
+# Graph Theory / Journey to the Moon
+
+import math
+import os
+import random
+import re
+import sys
+
+def journeyToMoon(n, pairs):
+    countries = []
+    for i in range(n):
+        astronaut = {i}
+        countries.append(astronaut)
+    for pair in pairs:
+        idx1, idx2 = pair[0], pair[1]
+        setId1 = findSet(countries, idx1)
+        setId2 = findSet(countries, idx2)
+        if setId1 != setId2:
+            countries = unionSets(countries, setId1, setId2)
+    #print(countries)
+    numOfPairs = countPairs(countries)
+    return numOfPairs
+
+def findSet(countries, idx):
+    if idx in countries[idx]:
+        return idx
+    newIdx = countries[idx].pop()
+    countries[idx].add(newIdx)
+    return findSet(countries, newIdx)
+
+def unionSets(countries, idx1, idx2):
+    newSet = countries[idx1].union(countries[idx2])
+    countries[idx1] = newSet
+    countries[idx2] = {idx1}
+    return countries
+
+def countPairs(countries):
+    if len(countries) < 2:
+        return 0
+    numOfPairs = 0
+    currentSum = 0
+    for i in range(n):
+        if i in countries[i]:
+            size = len(countries[i])
+        else:
+            size = 0
+        numOfPairs += currentSum * size
+        currentSum += size
+    return numOfPairs
+
+if __name__ == '__main__':
+    fptr = open(os.environ['OUTPUT_PATH'], 'w')
+    np = input().split()
+    n = int(np[0])
+    p = int(np[1])
+    astronauts = []
+    for _ in range(p):
+        astronauts.append(list(map(int, input().rstrip().split())))
+    result = journeyToMoon(n, astronauts)
+    fptr.write(str(result) + '\n')
+    fptr.close()
