@@ -1,0 +1,62 @@
+#Graph Theory / Kruskal (MST): Really Special Subtree 
+#Basically Minimum Spanning Tree
+
+import math
+import os
+import random
+import re
+import sys
+
+def kruskals(g_nodes, g_from, g_to, g_weight):
+    nodes = []
+    for idx in range(g_nodes + 1):
+        nodes.append(-1)
+    totalWt = 0
+    numOfEdges = 0
+    while numOfEdges < g_nodes - 1:
+        minIdx = getMinIdx(g_weight)
+        minWt = g_weight.pop(minIdx)
+        fromNode = g_from.pop(minIdx)
+        toNode = g_to.pop(minIdx)
+        fromParentId = findParent(fromNode, nodes)
+        toParentId = findParent(toNode, nodes)
+        if fromParentId != toParentId:
+            nodes = union(fromParentId, toParentId, nodes)
+            numOfEdges += 1
+            totalWt += minWt
+    return totalWt
+
+def getMinIdx(g_weight):
+    minIdx = 0
+    for i in range(len(g_weight)):
+        if g_weight[i] < g_weight[minIdx]:
+            minIdx = i
+    return minIdx
+    
+def findParent(idx, nodes):
+    if nodes[idx] < 0:
+        return idx
+    nodes[idx] = findParent(nodes[idx], nodes)
+    return nodes[idx]
+    
+def union(idx1, idx2, nodes):
+    if nodes[idx1] < nodes[idx2]:
+        nodes[idx2] = idx1
+    elif nodes[idx1] > nodes[idx2]:
+        nodes[idx1] = idx2
+    else: #if ranks are equal, increment the rank by 1
+        nodes[idx2] = idx1
+        nodes[idx1] -= 1
+    return nodes
+
+if __name__ == '__main__':
+    fptr = open(os.environ['OUTPUT_PATH'], 'w')
+    g_nodes, g_edges = map(int, input().rstrip().split())
+    g_from = [0] * g_edges
+    g_to = [0] * g_edges
+    g_weight = [0] * g_edges
+    for i in range(g_edges):
+        g_from[i], g_to[i], g_weight[i] = map(int, input().rstrip().split())
+    res = kruskals(g_nodes, g_from, g_to, g_weight)
+    fptr.write(str(res) + '\n')
+    fptr.close()
