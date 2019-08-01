@@ -6,46 +6,47 @@ import random
 import re
 import sys
 
+class Node(object):
+    def __init__(self, parent):
+        self.parent = parent
+        self.rank = 1
+        
 def journeyToMoon(n, pairs):
     countries = []
     for i in range(n):
-        astronaut = {i}
+        astronaut = Node(i)
         countries.append(astronaut)
     for pair in pairs:
-        idx1, idx2 = pair[0], pair[1]
-        setId1 = findSet(countries, idx1)
-        setId2 = findSet(countries, idx2)
-        if setId1 != setId2:
-            countries = unionSets(countries, setId1, setId2)
-    #print(countries)
+        pIdx1 = findParent(pair[0], countries)
+        pIdx2 = findParent(pair[1], countries)
+        if pIdx1 != pIdx2:
+            union(pIdx1, pIdx2, countries)
     numOfPairs = countPairs(countries)
     return numOfPairs
-
-def findSet(countries, idx):
-    if idx in countries[idx]:
+    
+def findParent(idx, nodes):
+    if nodes[idx].parent == idx:
         return idx
-    newIdx = countries[idx].pop()
-    countries[idx].add(newIdx)
-    return findSet(countries, newIdx)
-
-def unionSets(countries, idx1, idx2):
-    newSet = countries[idx1].union(countries[idx2])
-    countries[idx1] = newSet
-    countries[idx2] = {idx1}
-    return countries
-
-def countPairs(countries):
-    if len(countries) < 2:
+    nodes[idx].parent = findParent(nodes[idx].parent, nodes)
+    return nodes[idx].parent
+    
+def union(idx1, idx2, nodes):
+    if nodes[idx1].rank <= nodes[idx2].rank:
+        nodes[idx1].parent = nodes[idx2].parent
+        nodes[idx2].rank += nodes[idx1].rank 
+    else:
+        nodes[idx2].parent = nodes[idx1].parent
+        nodes[idx1].rank += nodes[idx2].rank
+        
+def countPairs(nodes):
+    if len(nodes) < 2:
         return 0
     numOfPairs = 0
     currentSum = 0
-    for i in range(n):
-        if i in countries[i]:
-            size = len(countries[i])
-        else:
-            size = 0
-        numOfPairs += currentSum * size
-        currentSum += size
+    for i in range(len(nodes)):
+        if nodes[i].parent == i:
+            numOfPairs += currentSum * nodes[i].rank
+            currentSum += nodes[i].rank
     return numOfPairs
 
 if __name__ == '__main__':
