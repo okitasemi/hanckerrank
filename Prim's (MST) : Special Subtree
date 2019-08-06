@@ -1,6 +1,6 @@
 # Graph Theory / Prim's (MST) : Special Subtree
 # Using customized Heap class
-# Code in the comment is using python's build-in heapq library
+# Code in the comment uses python's build-in heapq library
 
 import math
 import os
