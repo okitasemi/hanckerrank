@@ -20,14 +20,13 @@ class Heap(object):
         self.arr.append(value)
         self.size += 1
         currentIdx = self.size - 1
-        parentIdx = int(math.floor((currentIdx - 1) / 2))
-        while parentIdx >= 0:
-            if value[0] < self.arr[parentIdx][0]:
-                temp = self.arr[parentIdx]
-                self.arr[parentIdx] = value
-                self.arr[currentIdx] = temp
+        parentIdx = int((currentIdx - 1) / 2)
+        while value[0] < self.arr[parentIdx][0]:
+            temp = self.arr[parentIdx]
+            self.arr[parentIdx] = value
+            self.arr[currentIdx] = temp
             currentIdx = parentIdx
-            parentIdx = int(math.floor((currentIdx - 1) / 2))
+            parentIdx = int((currentIdx - 1) / 2)
     def removeMin(self):
         value = self.arr[0]
         self.arr[0] = self.arr[-1]
