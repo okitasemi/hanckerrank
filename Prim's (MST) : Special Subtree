@@ -1,4 +1,6 @@
 # Graph Theory / Prim's (MST) : Special Subtree
+# Using customized Heap class
+# Code in the comment is using python's build-in heapq library
 
 import math
 import os
@@ -7,6 +9,46 @@ import re
 import sys
 import heapq
 
+class Heap(object):
+    def __init__(self):
+        self.arr = []
+        self.size = 0
+    def heapify(self, arr):
+        for value in arr:
+            self.add(value)
+    def add(self, value):
+        self.arr.append(value)
+        self.size += 1
+        currentIdx = self.size - 1
+        parentIdx = int(math.floor((currentIdx - 1) / 2))
+        while parentIdx >= 0:
+            if value[0] < self.arr[parentIdx][0]:
+                temp = self.arr[parentIdx]
+                self.arr[parentIdx] = value
+                self.arr[currentIdx] = temp
+            currentIdx = parentIdx
+            parentIdx = int(math.floor((currentIdx - 1) / 2))
+    def removeMin(self):
+        value = self.arr[0]
+        self.arr[0] = self.arr[-1]
+        self.arr.pop()
+        self.size -= 1
+        currentIdx = 0
+        while (currentIdx + 1) * 2 - 1 < self.size:
+            minChildIdx = self.getMinChildIdx(currentIdx)
+            if self.arr[minChildIdx][0] < self.arr[currentIdx][0]:
+                temp = self.arr[currentIdx]
+                self.arr[currentIdx] = self.arr[minChildIdx]
+                self.arr[minChildIdx] = temp
+            currentIdx = minChildIdx
+        return value
+    def getMinChildIdx(self, currentIdx):
+        minChildIdx = (currentIdx + 1) * 2 - 1
+        if (currentIdx + 1) * 2 < self.size:
+            if self.arr[(currentIdx + 1) * 2][0] < self.arr[(currentIdx + 1) * 2 - 1][0]:
+                minChildIdx = (currentIdx + 1) * 2 
+        return minChildIdx
+        
 def prims(n, edges, start):
     nodes = []
     for i in range(n+1):
@@ -18,18 +60,22 @@ def prims(n, edges, start):
         nodes[node1].append((weight, node2))
         nodes[node2].append((weight, node1))
     
-    edgeQ = nodes[start]
-    heapq.heapify(edgeQ)
+    # edgeQ = nodes[start]
+    # heapq.heapify(edgeQ)
+    edgeQ = Heap()
+    edgeQ.heapify(nodes[start])
     connected = {start}
     totalWeight = 0
     while len(connected) < n:
-        minEdge = heapq.heappop(edgeQ)
+        #minEdge = heapq.heappop(edgeQ)
+        minEdge = edgeQ.removeMin()
         toNode = minEdge[1]
         if toNode not in connected:
+            totalWeight += minEdge[0]
             connected.add(toNode)
             for e in nodes[toNode]:
-                heapq.heappush(edgeQ, e)
-            totalWeight += minEdge[0]
+                #heapq.heappush(edgeQ, e)
+                edgeQ.add(e)
     return totalWeight
 
 if __name__ == '__main__':
