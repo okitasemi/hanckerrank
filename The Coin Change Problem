@@ -1,0 +1,43 @@
+#!/bin/python3
+
+# Dynamic Programming / The Coin Change Problem
+
+import math
+import os
+import random
+import re
+import sys
+
+def getWays(n, c):
+    # an NxM table to record number of ways to make i change with first j coins
+    changeNCoinsTable = [[0 for j in range(m + 1)] for i in range(n + 1)]
+    getWaysWithTable(n, c, changeNCoinsTable)
+    #print(changeNCoinsTable)
+    return changeNCoinsTable[n][len(c)]
+
+def getWaysWithTable(n, c, table):
+    for i in range(1, n+1):
+        for j in range(1, m + 1):
+            # the count at [i][j] is at least the count at [i][j-1]
+            table[i][j] = table[i][j-1]
+            # if the newly added coin is smaller than the target amount
+            # subtract the coin's value from the target amount to get the balance
+            # and find the number of ways to make the balance with previous coins
+            diff = i - c[j-1]
+            if diff > 0:
+                table[i][j] += table[diff][j]
+            # if the newly added coin is equal to the target amount, add 1 to the count
+            # if the newly added coin(x) is a factor of the target amount(y), do nothing
+            # because it would've been included in the count for (y-x)
+            if i == c[j-1]:
+                table[i][j] += 1
+
+if __name__ == '__main__':
+    fptr = open(os.environ['OUTPUT_PATH'], 'w')
+    first_multiple_input = input().rstrip().split()
+    n = int(first_multiple_input[0])
+    m = int(first_multiple_input[1])
+    c = list(map(int, input().rstrip().split()))
+    ways = getWays(n, c)
+    fptr.write(str(ways) + '\n')
+    fptr.close()
