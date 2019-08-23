@@ -1,0 +1,44 @@
+# Dynamic Programming / Construct the Array
+
+import math
+import os
+import random
+import re
+import sys
+
+def countArray(n, k, x): 
+    # If n<3, there is no way
+    # If n=3, result is k-1 when x=1, and k-2 when x!=1
+    # For n=3, k=3, x=1, there are 3-1=2 ways: 121 and 131
+    # For n=3, k=3, x=3, there is 3-2=1 way: 123
+    # For n>3, result is the sum of previous results at n-1 and different x values
+    # e.g. for n=4, k=3, x=2, we need to add up the results at n=3, k=3, x=1 and x=3
+    # Thus result for n=4, k=3, x=2 is 1+2=3
+    # Keep a memo of previous results for x=1 and x!=1, starting from n=3
+    # Note that results are the same for all x!=1 at each n
+    
+    if n < 3:
+        return 0
+        
+    memoForXisOne = k - 1
+    memoForXisElse = k - 2
+    for i in range(4, n+1):
+        newMemo1 = (memoForXisElse * (k-1)) % 1000000007 
+        newMemo2 = (memoForXisOne + memoForXisElse * (k-2)) % 1000000007 
+        memoForXisOne = newMemo1
+        memoForXisElse = newMemo2
+    
+    if x == 1:
+        return memoForXisOne
+    else:
+        return memoForXisElse
+
+if __name__ == '__main__':
+    fptr = open(os.environ['OUTPUT_PATH'], 'w')
+    nkx = input().split()
+    n = int(nkx[0])
+    k = int(nkx[1])
+    x = int(nkx[2])
+    answer = countArray(n, k, x)
+    fptr.write(str(answer) + '\n')
+    fptr.close()
