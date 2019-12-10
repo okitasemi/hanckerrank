@@ -1,0 +1,86 @@
+using System.CodeDom.Compiler;
+using System.Collections.Generic;
+using System.Collections;
+using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
+using System.IO;
+using System.Linq;
+using System.Reflection;
+using System.Runtime.Serialization;
+using System.Text.RegularExpressions;
+using System.Text;
+using System;
+
+class Solution {
+
+/*
+Put magazine words in a dictionary, then check note against it. 
+O(m+n) time. O(m) space. 
+*/  
+    static void checkMagazine1(string[] magazine, string[] note) {
+        Dictionary<string, int> wordDict = new Dictionary<string, int>();
+        foreach (string word in magazine) {
+            if (!wordDict.ContainsKey(word)) {
+                wordDict[word] = 1;
+            }
+            else {
+                wordDict[word] += 1;
+            }
+        }
+
+        foreach (string word in note) {
+            if (!wordDict.ContainsKey(word) || wordDict[word] <= 0) {
+                System.Console.WriteLine("No");
+                return;
+            }
+            else {
+                wordDict[word] -= 1;
+            }
+        }
+        System.Console.WriteLine("Yes");
+    }
+
+/*
+Put note words in a dictionary, then check magazine against it. 
+O(m+n) time. O(n) space. Likely less than O(m) space.
+*/ 
+    static void checkMagazine2(string[] magazine, string[] note) {
+        Dictionary<string, int> wordDict = new Dictionary<string, int>();
+        foreach (string word in note) {
+            if (!wordDict.ContainsKey(word)) {
+                wordDict[word] = 1;
+            }
+            else {
+                wordDict[word] += 1;
+            }
+        }
+
+        int count = note.Length;
+        foreach (string word in magazine) {
+           if (wordDict.ContainsKey(word) && wordDict[word] > 0) {
+               wordDict[word] -= 1;
+               count -= 1;
+               if (count == 0) {
+                   System.Console.WriteLine("Yes");
+                   return;
+               }
+           }
+        }
+        System.Console.WriteLine("No");
+    }
+
+    static void Main(string[] args) {
+        string[] mn = Console.ReadLine().Split(' ');
+
+        int m = Convert.ToInt32(mn[0]);
+
+        int n = Convert.ToInt32(mn[1]);
+
+        string[] magazine = Console.ReadLine().Split(' ');
+
+        string[] note = Console.ReadLine().Split(' ');
+
+        checkMagazine(magazine, note);
+    }
+}
