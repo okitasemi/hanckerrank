@@ -1,0 +1,61 @@
+using System.CodeDom.Compiler;
+using System.Collections.Generic;
+using System.Collections;
+using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
+using System.IO;
+using System.Linq;
+using System.Reflection;
+using System.Runtime.Serialization;
+using System.Text.RegularExpressions;
+using System.Text;
+using System;
+
+class Solution {
+
+    // O(n) time. O(n) space.
+    static string isBalanced(string s) {
+        Dictionary<char, char> bracketPairs = new Dictionary<char, char>() {
+            {'(', ')'}, {'[', ']'}, {'{', '}'}
+        };
+
+        Stack bracketStack = new Stack();
+        for (int i = 0; i < s.Length; i++) {
+            if (bracketStack.Count == 0) {
+                bracketStack.Push(s[i]);
+            }
+            else {
+                char topBracket = (char)bracketStack.Peek();
+                if (bracketPairs.ContainsKey(topBracket)
+                    && bracketPairs[topBracket] == s[i]) {
+                        bracketStack.Pop();
+                    }
+                else {
+                    bracketStack.Push(s[i]);
+                }
+            }
+        }
+        if (bracketStack.Count > 0) {
+            return "NO";
+        }
+        return "YES";
+    }
+
+    static void Main(string[] args) {
+        TextWriter textWriter = new StreamWriter(@System.Environment.GetEnvironmentVariable("OUTPUT_PATH"), true);
+
+        int t = Convert.ToInt32(Console.ReadLine());
+
+        for (int tItr = 0; tItr < t; tItr++) {
+            string s = Console.ReadLine();
+
+            string result = isBalanced(s);
+
+            textWriter.WriteLine(result);
+        }
+
+        textWriter.Flush();
+        textWriter.Close();
+    }
+}
