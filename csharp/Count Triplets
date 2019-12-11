@@ -1,0 +1,71 @@
+using System.CodeDom.Compiler;
+using System.Collections.Generic;
+using System.Collections;
+using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
+using System.IO;
+using System.Linq;
+using System.Reflection;
+using System.Runtime.Serialization;
+using System.Text.RegularExpressions;
+using System.Text;
+using System;
+
+class Solution {
+
+/*
+When encountering num*r, count the number of previous occurence of num and store that number. 
+When encountering base*r*r, sum the number of previous occurence of num*r & num duplets.
+O(n) time. O(n) space.
+When using division, make sure num % r == 0.
+*/
+
+    static long countTriplets(List<long> arr, long r) {
+        Dictionary<long, long> firstNum = new Dictionary<long, long>();
+        Dictionary<long, long> middleNum = new Dictionary<long, long>();
+        long count = 0;
+        foreach (long num in arr) {
+            if (num % r == 0 && middleNum.ContainsKey(num/r)) {
+                count += middleNum[num/r];
+            }
+
+            if (num % r == 0 && firstNum.ContainsKey(num/r)) {
+                if (!middleNum.ContainsKey(num)) {
+                    middleNum[num] = firstNum[num/r];
+                }
+                else {
+                    middleNum[num] += firstNum[num/r];
+                }
+            }
+            
+            if (!firstNum.ContainsKey(num)) {
+                firstNum[num] = 1;
+            }
+            else {
+                firstNum[num] += 1;
+            }
+        }
+        return count;
+            
+    }
+
+    static void Main(string[] args) {
+        TextWriter textWriter = new StreamWriter(@System.Environment.GetEnvironmentVariable("OUTPUT_PATH"), true);
+
+        string[] nr = Console.ReadLine().TrimEnd().Split(' ');
+
+        int n = Convert.ToInt32(nr[0]);
+
+        long r = Convert.ToInt64(nr[1]);
+
+        List<long> arr = Console.ReadLine().TrimEnd().Split(' ').ToList().Select(arrTemp => Convert.ToInt64(arrTemp)).ToList();
+
+        long ans = countTriplets(arr, r);
+
+        textWriter.WriteLine(ans);
+
+        textWriter.Flush();
+        textWriter.Close();
+    }
+}
