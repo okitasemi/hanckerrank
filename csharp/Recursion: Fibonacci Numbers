@@ -1,0 +1,37 @@
+using System;
+using System.Collections.Generic;
+using System.IO;
+
+class Solution {
+    
+    //O(n) time. O(1) space.
+    public static int Fibonacci(int n) {
+        int[] memo = new int[2] {0, 1};
+        if (n < 2) {
+            return memo[n];
+        }
+        for (int i = 2; i < n; i++) {
+            int newFib = memo[0] + memo[1];
+            memo[0] = memo[1];
+            memo[1] = newFib;
+        }
+        return memo[0] + memo[1];
+    }
+
+    //O(2^n) time. O(n) space.
+    public static int FibonacciRecursive(int n) {
+        if (n <= 0) {
+            return 0;
+        }
+        if (n == 1) {
+            return 1;
+        }
+        return Fibonacci(n - 1) + Fibonacci(n - 2);
+    }
+
+    static void Main(String[] args) {
+        int n = Convert.ToInt32(Console.ReadLine());
+        Console.WriteLine(Fibonacci(n));
+    }
+}
+
